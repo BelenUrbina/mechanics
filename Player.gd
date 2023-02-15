@@ -27,7 +27,6 @@ var jump_from_wall:bool = false
 func _physics_process(delta):
 	# Wall jump
 	if is_on_wall():
-		print("wall jump")
 		if !jump_from_wall:
 			motion.y = 0
 		jump_count = 0
@@ -37,39 +36,32 @@ func _physics_process(delta):
 		
 	motion.y += gravity * delta
 	motion.x = lerp(motion.x, 0, friction)
-	
-	if is_on_floor():
-		candash = true
-	if Input.is_action_just_pressed("dash") and candash:
-		motion = dashdirection.normalized() * dashspeed * dashdistance
-		candash = false
-	if Input.is_action_pressed("right") and candash:
-		motion.x = +speed
+
+	if Input.is_action_just_pressed("dash"):
+		motion = dashdirection * dashspeed * dashdistance
+	if Input.is_action_pressed("right"):
+		motion.x = speed 
 		dashdirection = Vector2.RIGHT
-	if Input.is_action_pressed("left") and candash:
-		motion.x = -speed 
+	if Input.is_action_pressed("left"):
+		motion.x = -speed
 		dashdirection = Vector2.LEFT
 	if Input.is_action_just_pressed("jump"):
 		if is_on_floor():
 			motion.y = jump_height
 			jump_count += 1
-			print("jump from floor")
 			jump_from_wall = false
 		elif is_on_wall():
-			print("jump from wall")
-			motion.y = jump_height
+			jump_count += 1
 			jump_from_wall = true 
 		else:
 			# Double Jump
 			if jump_count > 0 and jump_count < jump_max:
 				motion.y = jump_height
 				jump_count += 1
-				print("double jump")
 			# Coyote time
 			if !coyote_timer.is_stopped() and jump_count == 0:
 				motion.y = jump_height
 				jump_count += 1
-				print("coyote jump")
 
 	var was_on_floor = is_on_floor()
 	motion = move_and_slide(motion, Vector2.UP)
